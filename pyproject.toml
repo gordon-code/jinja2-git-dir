@@ -1,0 +1,74 @@
+[project]
+name = "jinja2-git-dir"
+version = "v0.1.0"
+description = "Jinja2 filter extension for detecting if a directory is a git repository"
+authors = [
+    {name = "Will Gordon", email = "will@gordoncode.dev"},
+]
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Typing :: Typed"
+]
+keywords = ["jinja", "jinja2", "extension", "filters", "copier"]
+dependencies = ["jinja2>=3.0"]
+
+[project.urls]
+repository = "https://github.com/gordoncode/jinja2-git-dir/"
+
+[dependency-groups]
+dev = ["mypy", "ruff", "pylint", "pytest", "pytest-subprocess"]
+
+[tool.hatch.build.targets.sdist]
+packages = ["src/jinja2_git_dir"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 120
+src = ["src"]
+target-version = "py39"
+cache-dir = ".cache/.ruff_cache"
+force-exclude = true
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["D100", "D101", "D102", "D104", "D205", "D401", "COM812"]
+unfixable = ["T201", "F401", "F841"]
+
+[tool.ruff.lint.per-file-ignores]
+"test_*.py" = ["S101", "PLR2004", "SLF001", "INP001", "ANN001", "ANN201", "D103"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["src"]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.pytest.ini_options]
+cache_dir = ".cache/.pytest_cache"
+python_files = "test_*.py"
+
+[tool.pylint.master]
+ignore-patterns = "test_.*.py"
+
+[tool.pylint.format]
+max-line-length = 120
+
+[tool.pylint.messages_control]
+disable = ["missing-module-docstring", "missing-class-docstring"]
+
+[tool.pylint.string]
+check-quote-consistency = "yes"
+
+[tool.mypy]
+cache_dir = ".cache/.mypy_cache"

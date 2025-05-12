@@ -1,0 +1,8 @@
+.cache/
+.direnv/
+.idea/
+.venv/
+
+__pycache__
+
+.DS_Store
