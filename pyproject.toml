@@ -1,6 +1,6 @@
 [project]
 name = "jinja2-git-dir"
-version = "v0.1.0"
+version = "v0.1.1"
 description = "Jinja2 filter extension for detecting if a directory is a git repository"
 authors = [
     {name = "Will Gordon", email = "will@gordoncode.dev"},
@@ -20,7 +20,7 @@ keywords = ["jinja", "jinja2", "extension", "filters", "copier"]
 dependencies = ["jinja2>=3.0"]
 
 [project.urls]
-repository = "https://github.com/gordoncode/jinja2-git-dir/"
+repository = "https://github.com/gordon-code/jinja2-git-dir/"
 
 [dependency-groups]
 dev = ["mypy", "ruff", "pylint", "pytest", "pytest-subprocess"]
