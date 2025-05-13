@@ -1,7 +1,10 @@
-import contextlib
+from inspect import getsourcefile
+from pathlib import Path
 
 import pytest
 from jinja2 import Environment
+
+project_root_path = Path(getsourcefile(lambda: 0)).resolve().parent.parent
 
 
 @pytest.fixture
@@ -10,19 +13,23 @@ def environment():
 
 
 @pytest.mark.parametrize(
-    ("git_path", "toplevel_git_dir", "expected"),
+    ("git_path", "toplevel_git_dir", "expected", "mock_subprocess"),
     [
-        ("/git-dir", "/git-dir", "True"),
-        ("/Git-Dir", "/git-dir", "True"),
-        ("/non-git-dir", "/", "False"),
-        (["not", "a", "path"], "/", "False"),
+        # cwd == "tests/" directory
+        (project_root_path, project_root_path, "True", False),
+        ("/git-dir", "/git-dir", "True", True),
+        ("/Git-Dir", "/git-dir", "True", True),
+        ("/non-git-dir", "/", "False", True),
+        (["not", "a", "path"], "/", "False", False),
     ],
 )
-def test_git_dir(git_path, toplevel_git_dir, expected, environment, fp):
-    with contextlib.suppress(TypeError):
+def test_git_dir(git_path, toplevel_git_dir, expected, mock_subprocess, environment, fp):  # noqa: PLR0913
+    command = ["git", "-C", git_path, "rev-parse", "--show-toplevel"]
+    if mock_subprocess:
         # Mock the subprocess result
-        # Allow to fail for "unhashable" input, this will be sanitized by the Path conversion
-        fp.register(["git", "-C", git_path, "rev-parse", "--show-toplevel"], stdout=toplevel_git_dir, occurrences=3)
+        fp.register(command, stdout=toplevel_git_dir, occurrences=3)
+    else:
+        fp.allow_unregistered(allow=True)
 
     # Test the rendered template
     template = environment.from_string("{{ git_path | gitdir }}")

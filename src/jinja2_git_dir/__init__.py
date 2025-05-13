@@ -5,6 +5,10 @@ from jinja2.environment import Environment
 from jinja2.ext import Extension
 
 
+def _normalize(git_path: str) -> str:
+    return git_path.strip().lower()
+
+
 def _git_dir(git_path: str) -> bool:
     # Utilize Path() to sanitize the input and resolve to an absolute path
     try:
@@ -13,8 +17,8 @@ def _git_dir(git_path: str) -> bool:
         return False
     command: list[str] = ["git", "-C", git_path, "rev-parse", "--show-toplevel"]
     try:
-        result: CompletedProcess[str] = run(command, check=True, capture_output=True, text=True)  # noqa: S603
-        return result.stdout.lower() == git_path.lower()
+        result: CompletedProcess[str] = run(command, check=True, capture_output=True, encoding="utf-8")  # noqa: S603
+        return _normalize(result.stdout) == _normalize(git_path)
     except CalledProcessError:
         return False
 
