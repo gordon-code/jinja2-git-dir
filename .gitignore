@@ -2,6 +2,7 @@
 .direnv/
 .idea/
 .venv/
+dist/
 
 __pycache__
 

@@ -14,7 +14,7 @@ def _git_dir(git_path: str) -> bool:
     command: list[str] = ["git", "-C", git_path, "rev-parse", "--show-toplevel"]
     try:
         result: CompletedProcess[str] = run(command, check=True, capture_output=True, text=True)  # noqa: S603
-        return result.stdout.lower() == git_path
+        return result.stdout.lower() == git_path.lower()
     except CalledProcessError:
         return False
 

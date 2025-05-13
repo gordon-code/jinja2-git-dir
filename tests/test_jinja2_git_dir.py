@@ -13,6 +13,7 @@ def environment():
     ("git_path", "toplevel_git_dir", "expected"),
     [
         ("/git-dir", "/git-dir", "True"),
+        ("/Git-Dir", "/git-dir", "True"),
         ("/non-git-dir", "/", "False"),
         (["not", "a", "path"], "/", "False"),
     ],
