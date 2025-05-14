@@ -68,6 +68,8 @@ _tasks:
     when: "{{ _copier_conf.dst_path | realpath | gitdir is false }}"
   - command: "git commit -am 'initial commit'"
     when: "{{ _copier_conf.dst_path | realpath | emptygit is true }}"
+  - command: "git commit -am 'template update applied'"
+    when: "{{ _copier_conf.dst_path | realpath | emptygit is false }}"
 ```
 
 ## Development
