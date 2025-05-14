@@ -32,3 +32,16 @@ _tasks:
   - command: "git init"
     when: "{{ _copier_conf.dst_path | realpath | gitdir }}"
 ```
+
+## Development
+
+- Use [`cog commit`](https://docs.cocogitto.io/guide/commit.html) for [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/)
+-- `cog commit -a feat "new thing"`
+- Use [`cog bump`](https://docs.cocogitto.io/guide/bump.html) for [SemVer versioning](https://semver.org)
+-- `cog bump --auto`
+- Use [`hatch build`](https://hatch.pypa.io/dev/cli/reference/#hatch-build) for building new package releases _after_ the repo version has been bumped
+-- `uvx hatch build`
+- Use [`hatch publish`](https://hatch.pypa.io/dev/cli/reference/#hatch-publish) to push the new package to PyPI
+-- `uvx hatch publish`
+- Bump the nixpkgs release to the new version
+-- https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/python-modules/jinja2-git-dir/default.nix
