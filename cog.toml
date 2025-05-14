@@ -9,7 +9,7 @@ post_bump_hooks = [
     "git tag {{version_tag}} {{version_tag}}^{} --force --sign --annotate --message='Release {{version}}'"
 ]
 
-[commit_types]
+tag_prefix = "v"
 
 [changelog]
 path = "CHANGELOG.md"
