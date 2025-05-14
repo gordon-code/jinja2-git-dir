@@ -1,8 +1,21 @@
 # Git Directory Extension
 
-Jinja2 filter extension for detecting if a directory is a git repository.
+Jinja2 filter extension for detecting if a directory is an (empty) git repository.
 
 ## Usage
+
+### `gitdir`
+
+Detects if the path being filtered by `gitdir` is the _top level_ git repository directory.
+
+So, if my path is `/git/path/here` and there exists `/git/path/here/.git`, 
+then `{{ '/git/path/here' | gitdir }}` will be true.
+
+However, if my path is `/git/path/here` and there exists `/git/path/.git`, 
+then `{{ '/git/path/here' | gitdir }}` will be false.
+
+This is because the _top level_ directory is `/git/path`, not the tested path of `/git/path/here`.
+
 
 Examples:
 
@@ -14,6 +27,28 @@ Examples:
     `{{ git_path | gitdir is false }}`
 - Using `gitdir` in a conditional  
     `{% if (git_path | gitdir) %}{{ git_path }} is a git directory{% else %}no git directory at {{ git_path }}{% endif %}`
+
+
+### `emptygit`
+
+Detects if the path being filtered by `emptygit` contains exactly 0 commits across all references. 
+This will work for subdirectories within a git directory.
+
+So, if my path is `/git/path/here` and there have been *no* commits, then `{{ '/git/path/here' | emptygit }}` will be true.
+
+However, if my path is `/git/path/here` and there *have* been _any_ commits anywhere, then `{{ '/git/path/here' | emptygit }}` will be false.
+
+
+Examples:
+
+- Detect if `git_path` is an empty git directory  
+    `{{ git_path | emptygit }}`
+- Assert that `git_path` is an empty git directory  
+    `{{ git_path | emptygit is true }}`
+- Assert that `git_path` is **NOT** an empty git directory  
+    `{{ git_path | emptygit is false }}`
+- Using `emptygit` in a conditional  
+    `{% if (git_path | emptygit) %}{{ git_path }} has commits{% else %}{{ git_path }} has NO commits{% endif %}`
 
 ### Copier
 
@@ -30,7 +65,9 @@ _jinja_extensions:
     - jinja2_git_dir.GitDirectoryExtension
 _tasks:
   - command: "git init"
-    when: "{{ _copier_conf.dst_path | realpath | gitdir }}"
+    when: "{{ _copier_conf.dst_path | realpath | gitdir is false }}"
+  - command: "git commit -am 'initial commit'"
+    when: "{{ _copier_conf.dst_path | realpath | emptygit is true }}"
 ```
 
 ## Development
