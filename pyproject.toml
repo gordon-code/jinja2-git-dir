@@ -1,6 +1,6 @@
 [project]
 name = "jinja2-git-dir"
-version = "v0.3.0"
+dynamic = ["version"]
 description = "Jinja2 filter extension for detecting if a directory is a git repository"
 authors = [
     {name = "Will Gordon", email = "will@gordoncode.dev"},
@@ -28,8 +28,14 @@ dev = ["mypy", "ruff", "pylint", "pytest", "pytest-subprocess"]
 [tool.hatch.build.targets.sdist]
 packages = ["src/jinja2_git_dir"]
 
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.version.raw-options]
+version_scheme = "only-version"
+
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [tool.ruff]

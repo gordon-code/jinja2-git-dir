@@ -49,6 +49,7 @@
               venvShellHook
               pip
               uv
+              pkgs.cocogitto
             ];
           };
         });
