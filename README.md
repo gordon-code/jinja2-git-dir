@@ -66,10 +66,11 @@ _jinja_extensions:
 _tasks:
   - command: "git init"
     when: "{{ _copier_conf.dst_path | realpath | gitdir is false }}"
-  - command: "git commit -am 'initial commit'"
-    when: "{{ _copier_conf.dst_path | realpath | emptygit is true }}"
+  # `emptygit is false` test must come first, otherwise both tasks trigger
   - command: "git commit -am 'template update applied'"
     when: "{{ _copier_conf.dst_path | realpath | emptygit is false }}"
+  - command: "git commit -am 'initial commit'"
+    when: "{{ _copier_conf.dst_path | realpath | emptygit is true }}"
 ```
 
 ## Development
