@@ -26,10 +26,13 @@ def _git_dir(git_path: str) -> bool:
 def _empty_git(git_path: str) -> bool:
     opts: list[str] = ["rev-list", "--all", "--count"]
     num_commits: str | None = _run_git_command_at_path(git_path, opts)
-    if num_commits and num_commits.isdigit():
-        return int(num_commits) == 0
 
-    return False
+    try:
+        num_commits = int(num_commits)  # type: ignore
+    except (ValueError, TypeError):
+        return False
+    else:
+        return num_commits == 0
 
 
 def _run_git_command_at_path(git_path: str, git_opts: list[str]) -> str | None:

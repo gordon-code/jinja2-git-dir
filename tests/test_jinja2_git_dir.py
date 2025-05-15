@@ -17,6 +17,7 @@ def environment():
     [
         (project_root_path, None, "True"),
         ("/git-dir", "/git-dir", "True"),
+        ("/git-dir", "/git-dir\n", "True"),
         ("/Git-Dir", "/git-dir", "True"),
         ("/non-git-dir", "/", "False"),
         (["not", "a", "path"], None, "False"),
@@ -49,6 +50,7 @@ def test_git_dir(git_path, mocked_toplevel_git_dir, expected, environment, fp):
     [
         (project_root_path, None, "False"),
         ("/git-dir", "0", "True"),
+        ("/git-dir", "0\n", "True"),
         ("/Git-Dir", "1", "False"),
         ("/non-git-dir", "", "False"),
         (["not", "a", "path"], None, "False"),
