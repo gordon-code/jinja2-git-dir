@@ -26,7 +26,7 @@ def test_git_dir(git_path, mocked_toplevel_git_dir, expected, environment, fp):
     command = ["git", "-C", git_path, "rev-parse", "--show-toplevel"]
     if mocked_toplevel_git_dir:
         # Mock the subprocess result
-        fp.register(command, stdout=mocked_toplevel_git_dir, occurrences=3)
+        fp.register(command, stdout=mocked_toplevel_git_dir, occurrences=4)
     else:
         fp.allow_unregistered(allow=True)
 
@@ -36,6 +36,9 @@ def test_git_dir(git_path, mocked_toplevel_git_dir, expected, environment, fp):
 
     template = environment.from_string("{{ git_path | gitdir is true }}")
     assert template.render(git_path=git_path) == expected
+
+    template = environment.from_string("{{ git_path | gitdir is false }}")
+    assert template.render(git_path=git_path) != expected
 
     template = environment.from_string("{% if (git_path | gitdir) %}True{% else %}False{% endif %}")
     assert template.render(git_path=git_path) == expected
@@ -56,7 +59,7 @@ def test_empty_git(git_path, mocked_num_commits, expected, environment, fp):
     command = ["git", "-C", git_path, "rev-list", "--all", "--count"]
     if mocked_num_commits:
         # Mock the subprocess result
-        fp.register(command, stdout=mocked_num_commits, occurrences=3)
+        fp.register(command, stdout=mocked_num_commits, occurrences=4)
     else:
         fp.allow_unregistered(allow=True)
 
@@ -66,6 +69,9 @@ def test_empty_git(git_path, mocked_num_commits, expected, environment, fp):
 
     template = environment.from_string("{{ git_path | emptygit is true }}")
     assert template.render(git_path=git_path) == expected
+
+    template = environment.from_string("{{ git_path | emptygit is false }}")
+    assert template.render(git_path=git_path) != expected
 
     template = environment.from_string("{% if (git_path | emptygit) %}True{% else %}False{% endif %}")
     assert template.render(git_path=git_path) == expected
