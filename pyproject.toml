@@ -23,7 +23,7 @@ dependencies = ["jinja2>=3.0"]
 repository = "https://github.com/gordon-code/jinja2-git-dir/"
 
 [dependency-groups]
-dev = ["mypy", "ruff", "pylint", "pytest", "pytest-subprocess"]
+dev = ["pyright", "ruff", "pytest", "pytest-subprocess"]
 
 [tool.hatch.build.targets.sdist]
 packages = ["src/jinja2_git_dir"]
@@ -64,17 +64,13 @@ convention = "numpy"
 cache_dir = ".cache/.pytest_cache"
 python_files = "test_*.py"
 
-[tool.pylint.master]
-ignore-patterns = "test_.*.py"
-
-[tool.pylint.format]
-max-line-length = 120
-
-[tool.pylint.messages_control]
-disable = ["missing-module-docstring", "missing-class-docstring"]
-
-[tool.pylint.string]
-check-quote-consistency = "yes"
-
-[tool.mypy]
-cache_dir = ".cache/.mypy_cache"
+[tool.pyright]
+pythonVersion = "3.9"
+typeCheckingMode = "standard"
+include = ["src"]
+exclude = [
+    "**/__pycache__",
+    "**/tests",
+]
+reportMissingImports = false
+reportMissingTypeStubs = false

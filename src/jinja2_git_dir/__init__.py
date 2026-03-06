@@ -28,7 +28,7 @@ def _empty_git(git_path: str) -> bool:
     num_commits: str | None = _run_git_command_at_path(git_path, opts)
 
     try:
-        num_commits = int(num_commits)  # type: ignore
+        num_commits = int(num_commits)  # type: ignore[arg-type]
     except (ValueError, TypeError):
         return False
     else:
