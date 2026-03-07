@@ -46,6 +46,115 @@ def test_git_dir(git_path, mocked_toplevel_git_dir, expected, environment, fp):
 
 
 @pytest.mark.parametrize(
+    ("git_path", "mock_commands", "expected"),
+    [
+        # Cascade level 1: upstream symbolic-ref
+        (
+            "/git-dir",
+            {
+                ("git", "-C", "/git-dir", "rev-parse", "--is-inside-work-tree"): "true",
+                (
+                    "git",
+                    "-C",
+                    "/git-dir",
+                    "symbolic-ref",
+                    "refs/remotes/upstream/HEAD",
+                ): "refs/remotes/upstream/develop",
+            },
+            "develop",
+        ),
+        # Cascade level 2: origin symbolic-ref (upstream fails)
+        (
+            "/git-dir",
+            {
+                ("git", "-C", "/git-dir", "rev-parse", "--is-inside-work-tree"): "true",
+                ("git", "-C", "/git-dir", "symbolic-ref", "refs/remotes/origin/HEAD"): "refs/remotes/origin/main\n",
+            },
+            "main",
+        ),
+        # Cascade level 3: ls-remote upstream
+        (
+            "/git-dir",
+            {
+                ("git", "-C", "/git-dir", "rev-parse", "--is-inside-work-tree"): "true",
+                (
+                    "git",
+                    "-C",
+                    "/git-dir",
+                    "ls-remote",
+                    "--symref",
+                    "upstream",
+                    "HEAD",
+                ): "ref: refs/heads/master\tHEAD\nabc123\tHEAD\n",
+            },
+            "master",
+        ),
+        # Cascade level 4: ls-remote origin
+        (
+            "/git-dir",
+            {
+                ("git", "-C", "/git-dir", "rev-parse", "--is-inside-work-tree"): "true",
+                (
+                    "git",
+                    "-C",
+                    "/git-dir",
+                    "ls-remote",
+                    "--symref",
+                    "origin",
+                    "HEAD",
+                ): "ref: refs/heads/trunk\tHEAD\nabc123\tHEAD\n",
+            },
+            "trunk",
+        ),
+        # Cascade level 5: git config init.defaultBranch
+        (
+            "/git-dir",
+            {
+                ("git", "-C", "/git-dir", "rev-parse", "--is-inside-work-tree"): "true",
+                ("git", "-C", "/git-dir", "config", "init.defaultBranch"): "master\n",
+            },
+            "master",
+        ),
+        # Cascade level 6: hardcoded fallback "main"
+        (
+            "/git-dir",
+            {
+                ("git", "-C", "/git-dir", "rev-parse", "--is-inside-work-tree"): "true",
+            },
+            "main",
+        ),
+        # Not a git repo → empty string
+        ("/non-git-dir", {}, ""),
+        # Invalid path type → empty string
+        (["not", "a", "path"], {}, ""),
+    ],
+)
+def test_git_default_branch(git_path, mock_commands, expected, environment, fp):
+    # Register mocked commands that should succeed
+    for cmd, stdout in mock_commands.items():
+        fp.register(list(cmd), stdout=stdout)
+
+    # Let unregistered commands fail (CalledProcessError)
+    fp.allow_unregistered(allow=True)
+
+    template = environment.from_string("{{ git_path | gitdefaultbranch }}")
+    assert template.render(git_path=git_path) == expected
+
+
+def test_git_default_branch_conditional(environment, fp):
+    """Test gitdefaultbranch in a conditional — non-empty string is truthy."""
+    fp.register(
+        ["git", "-C", "/git-dir", "rev-parse", "--is-inside-work-tree"],
+        stdout="true",
+    )
+    fp.allow_unregistered(allow=True)
+
+    template = environment.from_string("{% if (git_path | gitdefaultbranch) %}yes{% else %}no{% endif %}")
+    assert template.render(git_path="/git-dir") == "yes"
+    assert template.render(git_path="/non-git-dir") == "no"
+
+
+@pytest.mark.parametrize(
     ("git_path", "mocked_num_commits", "expected"),
     [
         (project_root_path, None, "False"),
