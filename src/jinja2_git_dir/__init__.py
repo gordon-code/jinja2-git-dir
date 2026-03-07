@@ -23,6 +23,51 @@ def _git_dir(git_path: str) -> bool:
     return False
 
 
+def _parse_symbolic_ref(output: str) -> str:
+    stripped = output.strip()
+    if stripped and "/" in stripped:
+        return stripped.split("/")[-1]
+    return ""
+
+
+def _parse_ls_remote_symref(output: str) -> str:
+    for line in output.splitlines():
+        if line.startswith("ref: refs/heads/"):
+            ref_path = line.split("\t")[0]
+            return ref_path.split("/")[-1]
+    return ""
+
+
+def _git_default_branch(git_path: str) -> str:
+    # Not a git repo → empty string
+    if _run_git_command_at_path(git_path, ["rev-parse", "--is-inside-work-tree"]) is None:
+        return ""
+
+    # Try symbolic-ref for upstream, then origin (local, fast)
+    for remote in ("upstream", "origin"):
+        result = _run_git_command_at_path(git_path, ["symbolic-ref", f"refs/remotes/{remote}/HEAD"])
+        if result:
+            branch = _parse_symbolic_ref(result)
+            if branch:
+                return branch
+
+    # Try ls-remote for upstream, then origin (network, read-only)
+    for remote in ("upstream", "origin"):
+        result = _run_git_command_at_path(git_path, ["ls-remote", "--symref", remote, "HEAD"])
+        if result:
+            branch = _parse_ls_remote_symref(result)
+            if branch:
+                return branch
+
+    # Try git config init.defaultBranch
+    result = _run_git_command_at_path(git_path, ["config", "init.defaultBranch"])
+    if result and result.strip():
+        return result.strip()
+
+    # Ultimate fallback
+    return "main"
+
+
 def _empty_git(git_path: str) -> bool:
     opts: list[str] = ["rev-list", "--all", "--count"]
     num_commits: str | None = _run_git_command_at_path(git_path, opts)
@@ -60,3 +105,4 @@ class GitDirectoryExtension(Extension):
         super().__init__(environment)
         environment.filters["gitdir"] = _git_dir
         environment.filters["emptygit"] = _empty_git
+        environment.filters["gitdefaultbranch"] = _git_default_branch

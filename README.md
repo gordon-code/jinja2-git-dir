@@ -1,6 +1,6 @@
 # Git Directory Extension
 
-Jinja2 filter extension for detecting if a directory is an (empty) git repository.
+Jinja2 filter extension for detecting if a directory is an (empty) git repository and determining the default branch.
 
 ## Usage
 
@@ -50,6 +50,29 @@ Examples:
 - Using `emptygit` in a conditional  
     `{% if (git_path | emptygit) %}{{ git_path }} has commits{% else %}{{ git_path }} has NO commits{% endif %}`
 
+### `gitdefaultbranch`
+
+Returns the default branch name for the git repository at the given path. Uses a multi-layered
+fallback cascade to determine the default branch:
+
+1. `git symbolic-ref refs/remotes/upstream/HEAD` (local, fast)
+2. `git symbolic-ref refs/remotes/origin/HEAD` (local, fast)
+3. `git ls-remote --symref upstream HEAD` (network, read-only)
+4. `git ls-remote --symref origin HEAD` (network, read-only)
+5. `git config init.defaultBranch` (local config)
+6. Hardcoded fallback: `main`
+
+Returns an empty string if the path is not a git repository.
+
+
+Examples:
+
+- Get the default branch name
+    `{{ git_path | gitdefaultbranch }}`
+- Using `gitdefaultbranch` in a conditional
+    `{% if (git_path | gitdefaultbranch) %}default branch: {{ git_path | gitdefaultbranch }}{% endif %}`
+
+
 ### Copier
 
 This can be utilized within a Copier `copier.yaml` file for determining if the destination
@@ -66,7 +89,7 @@ _jinja_extensions:
 _tasks:
   - command: "git init"
     when: "{{ _copier_conf.dst_path | realpath | gitdir is false }}"
-  # `emptygit is false` test must come first, otherwise both tasks trigger
+  # ORDERING: `emptygit is false` test must come first, otherwise both tasks trigger
   - command: "git commit -am 'template update applied'"
     when: "{{ _copier_conf.dst_path | realpath | emptygit is false }}"
   - command: "git commit -am 'initial commit'"
