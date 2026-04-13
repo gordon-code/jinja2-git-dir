@@ -1,11 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "rangeStrategy": "widen",
-  "packageRules": [
-    {
-      "description": "Don't pin Python version (managed by .python-version)",
-      "matchDatasources": ["python-version"],
-      "enabled": false
-    }
-  ]
+  "description": [
+    "Managed by khepri-deps/renovate — global config provides weekly Monday schedule, 14-day release cooldown, and vulnerability alert bypass."
+  ],
+  "rangeStrategy": "widen"
 }
