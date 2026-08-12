@@ -48,7 +48,7 @@ force-exclude = true
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["D100", "D101", "D102", "D104", "D205", "D401", "COM812"]
+ignore = ["D100", "D101", "D102", "D104", "D205", "D401", "COM812", "CPY001"]
 unfixable = ["T201", "F401", "F841"]
 
 [tool.ruff.lint.per-file-ignores]
