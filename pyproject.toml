@@ -32,7 +32,6 @@ packages = ["src/jinja2_git_dir"]
 source = "vcs"
 
 [tool.hatch.version.raw-options]
-version_scheme = "only-version"
 local_scheme = "no-local-version"
 
 [build-system]
